@@ -5,11 +5,8 @@
 
 import numpy as np
 import cv2
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+import math
+from edgeDetection.util import draw_line
 
 def auto_canny(image, sigma=0.33):
     # compute the median of the single channel pixel intensities
@@ -21,25 +18,70 @@ def auto_canny(image, sigma=0.33):
     # return the edged image
     return edged
 
+def initializeHough(h, w, delta_d, delta_theta):
+    min_d = w
+    max_d = math.sqrt(math.pow(h,2) + math.pow(w,2))
+    x = math.floor(180 / delta_theta)
+    y = math.floor((min_d + max_d) / delta_d)
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-    img = cv2.imread("/Users/victoriaoberascher/Documents/FH_Hagenberg/5.Semester/ATF/Übungen/ATF_UE01_Zusatzmaterial/data/porsche.png")
+    print(h, w, min_d, max_d, x, y)
+
+    return np.zeros([y, x], dtype=int)
+
+def getEdges(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(gray, (3, 3), 0)
 
     wide = cv2.Canny(blurred, 10, 200)
-    tight = cv2.Canny(blurred, 225, 250)
-    auto = auto_canny(blurred)
+    # tight = cv2.Canny(blurred, 225, 250)
+    # auto = auto_canny(blurred)
+    return wide
 
-    # show the images
-    cv2.imshow("Original", img)
-    cv2.imshow("Edges", np.hstack([wide, tight, auto]))
+def getParameterSpace(edges):
+    delta_theta = 1
+    delta_d = 1
+    h, w = edges.shape
+
+    H = initializeHough(h, w, delta_d, delta_theta)
+
+    for (y, x) in np.argwhere(edges != 0):
+        for theta in range(0, 180, delta_theta):
+            theta_rad = np.deg2rad(theta)
+            d = int(x * math.cos(theta_rad) + y * math.sin(theta_rad))
+            #print(d)
+            H[d+w, theta] += 1
+
+    return H/H.max()
+
+
+
+# Press the green button in the gutter to run the script.
+if __name__ == '__main__':
+    img = cv2.imread("images/triangle.png")
+    edges = getEdges(img);
+    h, w = edges.shape
+
+    # show the image
+    cv2.imshow("Original Images", img)
+    cv2.imshow("Edges", edges)
     cv2.waitKey(0)
+
+    H = getParameterSpace(edges)
+
+    cv2.imshow("Parameter Space", H)
     cv2.waitKey(0)
+
+
+    # Draw Lines
+    threshold = 0.4
+    for(d, theta) in np.argwhere(H >= threshold):
+        draw_line(img, (d-w), np.deg2rad(theta))
+
+    cv2.imshow("Img", img)
     cv2.waitKey(0)
-    cv2.waitKey(0)
+
+
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
