@@ -49,7 +49,6 @@ def getParameterSpace(edges):
         for theta in range(0, 180, delta_theta):
             theta_rad = np.deg2rad(theta)
             d = int(x * math.cos(theta_rad) + y * math.sin(theta_rad))
-            #print(d)
             H[d+w, theta] += 1
 
     return H/H.max()
@@ -71,14 +70,17 @@ if __name__ == '__main__':
 
     cv2.imshow("Parameter Space", H)
     cv2.waitKey(0)
+    cv2.waitKey(0)
 
 
     # Draw Lines
-    threshold = 0.4
+    threshold = 0.7
     for(d, theta) in np.argwhere(H >= threshold):
         draw_line(img, (d-w), np.deg2rad(theta))
 
     cv2.imshow("Img", img)
+    cv2.waitKey(0)
+    cv2.waitKey(0)
     cv2.waitKey(0)
 
 
