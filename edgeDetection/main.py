@@ -70,20 +70,39 @@ if __name__ == '__main__':
 
     cv2.imshow("Parameter Space", H)
     cv2.waitKey(0)
-    cv2.waitKey(0)
-
 
     # Draw Lines
-    threshold = 0.7
-    for(d, theta) in np.argwhere(H >= threshold):
-        draw_line(img, (d-w), np.deg2rad(theta))
+    threshold = 0.4
+    threshold_d = 5
+    threshold_theta = 0.04
 
-    cv2.imshow("Img", img)
+    num_lines = 5  # number of lines to draw
+    idx_d_arr, idx_theta_arr = np.where(H > threshold)
+    temp_idx = np.argsort(-1 * H[idx_d_arr, idx_theta_arr])
+    lines = np.array([idx_d_arr[temp_idx], idx_theta_arr[temp_idx]]).T
+
+    valueStore = []
+    valueStore_d = []
+    valueStore_theta = []
+
+    for idx_d, idx_theta in lines[:num_lines]:
+        d = idx_d - w
+        theta = np.deg2rad(idx_theta)
+
+        for d_store, theta_store in valueStore:
+            if (np.abs(d_store - d) < threshold_d) and (np.abs(theta_store - theta) < threshold_theta):
+                draw_line(img, d, theta, color=(0, 255, 255))
+                break;
+        else:
+            valueStore.append([d, theta])
+            draw_line(img, d, theta)
+
+        print(d, theta)
+        print()
+
+    cv2.imshow("detected lines", img)
     cv2.waitKey(0)
     cv2.waitKey(0)
     cv2.waitKey(0)
-
-
-
-
+    cv2.waitKey(0)
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
