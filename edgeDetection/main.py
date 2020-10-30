@@ -8,6 +8,10 @@ import cv2
 import math
 from edgeDetection.util import draw_line
 
+DELTA_THETA = 1
+DELTA_D = 1
+
+
 def auto_canny(image, sigma=0.33):
     # compute the median of the single channel pixel intensities
     v = np.median(image)
@@ -18,16 +22,17 @@ def auto_canny(image, sigma=0.33):
     # return the edged image
     return edged
 
+
 def initializeHough(h, w, delta_d, delta_theta):
     min_d = w
-    max_d = math.sqrt(math.pow(h,2) + math.pow(w,2))
+    max_d = math.sqrt(math.pow(h, 2) + math.pow(w, 2))
     x = math.floor(180 / delta_theta)
     y = math.floor((min_d + max_d) / delta_d)
-
 
     print(h, w, min_d, max_d, x, y)
 
     return np.zeros([y, x], dtype=int)
+
 
 def getEdges(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -38,21 +43,20 @@ def getEdges(img):
     # auto = auto_canny(blurred)
     return wide
 
+
 def getParameterSpace(edges):
-    delta_theta = 1
-    delta_d = 1
     h, w = edges.shape
 
-    H = initializeHough(h, w, delta_d, delta_theta)
+    H = initializeHough(h, w, DELTA_D, DELTA_THETA)
 
     for (y, x) in np.argwhere(edges != 0):
-        for theta in range(0, 180, delta_theta):
+        for theta in range(0, 180, DELTA_THETA):
             theta_rad = np.deg2rad(theta)
             d = int(x * math.cos(theta_rad) + y * math.sin(theta_rad))
-            H[d+w, theta] += 1
+            # H[d+w, theta] += 1
+            H[int(d + w) // DELTA_THETA, theta] += 1
 
-    return H/H.max()
-
+    return H / H.max()
 
 
 # Press the green button in the gutter to run the script.
@@ -76,7 +80,7 @@ if __name__ == '__main__':
     threshold_d = 20
     threshold_theta = np.deg2rad(7)
 
-    num_lines = 80  # number of lines to draw
+    num_lines = 70  # number of lines to draw
     idx_d_arr, idx_theta_arr = np.where(H > threshold)
     temp_idx = np.argsort(-1 * H[idx_d_arr, idx_theta_arr])
     lines = np.array([idx_d_arr[temp_idx], idx_theta_arr[temp_idx]]).T
@@ -86,16 +90,17 @@ if __name__ == '__main__':
     valueStore_theta = []
 
     for idx_d, idx_theta in lines[:num_lines]:
-        d = idx_d - w
+        d = idx_d*DELTA_D - w
+
+        theta = (idx_theta*DELTA_THETA + 90) % 180
         theta = np.deg2rad(idx_theta)
 
         if np.abs(theta) < threshold_theta:
-            theta = theta + 180
-            d = d * -1
+            d = -d
 
         for d_store, theta_store in valueStore:
             if (np.abs(d_store - d) < threshold_d) and (np.abs(theta_store - theta) < threshold_theta):
-                #draw_line(img, d, theta, color=(0, 255, 255))
+                # draw_line(img, d, theta, color=(0, 255, 255))
                 break;
         else:
             valueStore.append([d, theta])

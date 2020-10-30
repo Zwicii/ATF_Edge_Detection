@@ -1,2 +1,5 @@
 edgeDetection/.idea
+venv
+edgeDetection/__pycache__
+.idea
 edgeDetection/venv
