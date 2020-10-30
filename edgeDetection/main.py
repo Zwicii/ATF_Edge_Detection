@@ -57,7 +57,7 @@ def getParameterSpace(edges):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    img = cv2.imread("images/triangle.png")
+    img = cv2.imread("images/dice.png")
     edges = getEdges(img);
     h, w = edges.shape
 
@@ -73,10 +73,10 @@ if __name__ == '__main__':
 
     # Draw Lines
     threshold = 0.4
-    threshold_d = 5
-    threshold_theta = 0.04
+    threshold_d = 20
+    threshold_theta = np.deg2rad(7)
 
-    num_lines = 5  # number of lines to draw
+    num_lines = 80  # number of lines to draw
     idx_d_arr, idx_theta_arr = np.where(H > threshold)
     temp_idx = np.argsort(-1 * H[idx_d_arr, idx_theta_arr])
     lines = np.array([idx_d_arr[temp_idx], idx_theta_arr[temp_idx]]).T
@@ -89,15 +89,19 @@ if __name__ == '__main__':
         d = idx_d - w
         theta = np.deg2rad(idx_theta)
 
+        if np.abs(theta) < threshold_theta:
+            theta = theta + 180
+            d = d * -1
+
         for d_store, theta_store in valueStore:
             if (np.abs(d_store - d) < threshold_d) and (np.abs(theta_store - theta) < threshold_theta):
-                draw_line(img, d, theta, color=(0, 255, 255))
+                #draw_line(img, d, theta, color=(0, 255, 255))
                 break;
         else:
             valueStore.append([d, theta])
             draw_line(img, d, theta)
 
-        print(d, theta)
+        print(d, np.rad2deg(theta))
         print()
 
     cv2.imshow("detected lines", img)
