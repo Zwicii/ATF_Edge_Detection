@@ -23,14 +23,11 @@ def auto_canny(image, sigma=0.33):
     return edged
 
 
-def initializeHough(h, w, delta_d, delta_theta):
+def initializeHough(h, w):
     min_d = w
     max_d = math.sqrt(math.pow(h, 2) + math.pow(w, 2))
-    x = math.floor(180 / delta_theta)
-    y = math.floor((min_d + max_d) / delta_d)
-
-    print(h, w, min_d, max_d, x, y)
-
+    x = math.floor(180 / DELTA_THETA)
+    y = math.floor((min_d + max_d) / DELTA_D)
     return np.zeros([y, x], dtype=int)
 
 
@@ -46,15 +43,13 @@ def getEdges(img):
 
 def getParameterSpace(edges):
     h, w = edges.shape
-
-    H = initializeHough(h, w, DELTA_D, DELTA_THETA)
+    H = initializeHough(h, w)
 
     for (y, x) in np.argwhere(edges != 0):
         for theta in range(0, 180, DELTA_THETA):
             theta_rad = np.deg2rad(theta)
             d = int(x * math.cos(theta_rad) + y * math.sin(theta_rad))
-            # H[d+w, theta] += 1
-            H[int(d + w) // DELTA_THETA, theta] += 1
+            H[int(d + w) // DELTA_D, theta//DELTA_THETA] += 1
 
     return H / H.max()
 
