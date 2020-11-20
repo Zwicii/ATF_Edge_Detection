@@ -49,31 +49,31 @@ def getParameterSpace(edges):
         for theta in range(0, 180, DELTA_THETA):
             theta_rad = np.deg2rad(theta)
             d = int(x * math.cos(theta_rad) + y * math.sin(theta_rad))
-            H[int(d + w) // DELTA_D, theta//DELTA_THETA] += 1
+            H[int(d + w) // DELTA_D, theta // DELTA_THETA] += 1
 
     return H / H.max()
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    img = cv2.imread("images/dice.png")
+    img = cv2.imread("data/dice.png")
     edges = getEdges(img);
     h, w = edges.shape
 
     # show the image
-    cv2.imshow("Original Images", img)
-    cv2.imshow("Edges", edges)
-    cv2.waitKey(0)
+    # cv2.imshow("Original Images", img)
+    # cv2.imshow("Edges", edges)
+    # cv2.waitKey(0)
 
     H = getParameterSpace(edges)
 
-    cv2.imshow("Parameter Space", H)
-    cv2.waitKey(0)
+    # cv2.imshow("Parameter Space", H)
+    # cv2.waitKey(0)
 
     # Draw Lines
     threshold = 0.4
     threshold_d = 20
-    threshold_theta = np.deg2rad(7)
+    threshold_theta = 7
 
     num_lines = 70  # number of lines to draw
     idx_d_arr, idx_theta_arr = np.where(H > threshold)
@@ -81,32 +81,36 @@ if __name__ == '__main__':
     lines = np.array([idx_d_arr[temp_idx], idx_theta_arr[temp_idx]]).T
 
     valueStore = []
-    valueStore_d = []
-    valueStore_theta = []
 
     for idx_d, idx_theta in lines[:num_lines]:
-        d = idx_d*DELTA_D - w
+        d = idx_d * DELTA_D - w
+        theta = (idx_theta * DELTA_THETA)
 
-        theta = (idx_theta*DELTA_THETA + 90) % 180
-        theta = np.deg2rad(idx_theta)
+        originalValues = None
 
-        if np.abs(theta) < threshold_theta:
+        if theta < threshold_theta:
+            originalValues = [d, theta]
+            theta = theta + 180
             d = -d
 
         for d_store, theta_store in valueStore:
             if (np.abs(d_store - d) < threshold_d) and (np.abs(theta_store - theta) < threshold_theta):
-                # draw_line(img, d, theta, color=(0, 255, 255))
-                break;
-        else:
-            valueStore.append([d, theta])
-            draw_line(img, d, theta)
+                # draw_line(img, d, np.deg2rad(theta), color=(0, 255, 255)
+                break
 
-        print(d, np.rad2deg(theta))
-        print()
+            if originalValues is not None:
+                if (np.abs(originalValues[0] - d) < threshold_d) and (np.abs(originalValues[1] - theta) < threshold_theta):
+                    break
+
+        else:
+            if originalValues is not None:
+                valueStore.append([originalValues[0], originalValues[1]])
+
+            valueStore.append([d, theta])
+            draw_line(img, d, np.deg2rad(theta))
+
 
     cv2.imshow("detected lines", img)
     cv2.waitKey(0)
-    cv2.waitKey(0)
-    cv2.waitKey(0)
-    cv2.waitKey(0)
+
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
