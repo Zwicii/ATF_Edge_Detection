@@ -18,7 +18,7 @@ def processFrame(img):
     cv2.imshow("edges", edges)
 
     # mask
-    mask = cv2.imread("data/mask_1.png", cv2.IMREAD_GRAYSCALE)
+    mask = cv2.imread("data/mask.png", cv2.IMREAD_GRAYSCALE)
     edges[mask == 0] = 0
 
     lines = cv2.HoughLines(edges, 1, np.pi / 180, THRESHOLD)
@@ -29,66 +29,67 @@ def processFrame(img):
     left_lane = None
     right_lane = None
 
-    for line in lines:
+    if lines is not None:
+        for line in lines:
 
-        for d, theta_rad in line:
-            theta = np.rad2deg(theta_rad)
-            originalValues = None
+            for d, theta_rad in line:
+                theta = np.rad2deg(theta_rad)
+                originalValues = None
 
-            if theta < THRESHOLD_THETA:
-                originalValues = [d, theta]
-                theta = theta + 180
-                d = -d
+                if theta < THRESHOLD_THETA:
+                    originalValues = [d, theta]
+                    theta = theta + 180
+                    d = -d
 
-            for d_store, theta_store in valueStore:
-                if (np.abs(d_store - d) < THRESHOLD_D) and (np.abs(theta_store - theta) < THRESHOLD_THETA):
-                    # draw_line(img, d, np.deg2rad(theta), color=(0, 255, 255))
-                    break
-
-                if originalValues is not None:
-                    if (np.abs(originalValues[0] - d) < THRESHOLD_D) and (
-                            np.abs(originalValues[1] - theta) < THRESHOLD_THETA):
+                for d_store, theta_store in valueStore:
+                    if (np.abs(d_store - d) < THRESHOLD_D) and (np.abs(theta_store - theta) < THRESHOLD_THETA):
                         # draw_line(img, d, np.deg2rad(theta), color=(0, 255, 255))
                         break
 
-            else:
-                if originalValues is not None:
-                    valueStore.append([originalValues[0], originalValues[1]])
+                    if originalValues is not None:
+                        if (np.abs(originalValues[0] - d) < THRESHOLD_D) and (
+                                np.abs(originalValues[1] - theta) < THRESHOLD_THETA):
+                            # draw_line(img, d, np.deg2rad(theta), color=(0, 255, 255))
+                            break
 
-                valueStore.append([d, theta])
-                # draw value and lines
-                val, type = getDrawingParameters(d, np.deg2rad(theta), w, h)
-
-                if type == "left_lane":
-                    if left_lane is None or left_lane[0] < val:
-                        left_lane = val, d, theta
-                elif type == "right_lane":
-                    if right_lane is None or right_lane[0] > val:
-                        right_lane = val, d, theta
                 else:
-                    draw_line(img, d, np.deg2rad(theta), color=(160, 160, 160))
+                    if originalValues is not None:
+                        valueStore.append([originalValues[0], originalValues[1]])
 
-    if left_lane is not None:
-        draw_line(img, left_lane[1], np.deg2rad(left_lane[2]), color=(0, 235, 0))
-        cv2.putText(
-            img,  # numpy array on which text is written
-            "L: " + str(left_lane[0]),  # text
-            pos_left,  # position at which writing has to start
-            cv2.FONT_HERSHEY_SIMPLEX,  # font family
-            0.8,  # font size
-            (0, 0, 0),  # font color
-            2)  # font stroke
+                    valueStore.append([d, theta])
+                    # draw value and lines
+                    val, type = getDrawingParameters(d, np.deg2rad(theta), w, h)
 
-    if right_lane is not None:
-        draw_line(img, right_lane[1], np.deg2rad(right_lane[2]), color=(0, 0, 204))
-        cv2.putText(
-            img,  # numpy array on which text is written
-            "R: " + str(right_lane[0]),  # text
-            pos_right,  # position at which writing has to start
-            cv2.FONT_HERSHEY_SIMPLEX,  # font family
-            0.8,  # font size
-            (0, 0, 0),  # font color
-            2)  # font stroke
+                    if type == "left_lane":
+                        if left_lane is None or left_lane[0] < val:
+                            left_lane = val, d, theta
+                    elif type == "right_lane":
+                        if right_lane is None or right_lane[0] > val:
+                            right_lane = val, d, theta
+                    else:
+                        draw_line(img, d, np.deg2rad(theta), color=(160, 160, 160))
+
+        if left_lane is not None:
+            draw_line(img, left_lane[1], np.deg2rad(left_lane[2]), color=(0, 235, 0))
+            cv2.putText(
+                img,  # numpy array on which text is written
+                "L: " + str(left_lane[0]),  # text
+                pos_left,  # position at which writing has to start
+                cv2.FONT_HERSHEY_SIMPLEX,  # font family
+                0.8,  # font size
+                (0, 0, 0),  # font color
+                2)  # font stroke
+
+        if right_lane is not None:
+            draw_line(img, right_lane[1], np.deg2rad(right_lane[2]), color=(0, 0, 204))
+            cv2.putText(
+                img,  # numpy array on which text is written
+                "R: " + str(right_lane[0]),  # text
+                pos_right,  # position at which writing has to start
+                cv2.FONT_HERSHEY_SIMPLEX,  # font family
+                0.8,  # font size
+                (0, 0, 0),  # font color
+                2)  # font stroke
 
     return img
 
@@ -110,6 +111,15 @@ def getDrawingParameters(d, theta, w, h):
 
 
 if __name__ == '__main__':
+    #read image
+    img = cv2.imread("data/highway1-3.png")
+    ksize = (6, 6)
+    blurImg = cv2.blur(img, ksize)
+    processedImage = processFrame(blurImg)
+    cv2.imshow("detected filtered lines", processedImage)
+    cv2.waitKey(0)
+
+    #video
     cap = cv2.VideoCapture("data/highway1.mp4")
 
     while True:
@@ -126,8 +136,4 @@ if __name__ == '__main__':
 
     cv2.destroyAllWindows()
     cap.release()
-
-    #read image
-    img = cv2.imread("data/highway1-3.png")
-
 
