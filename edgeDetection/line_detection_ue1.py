@@ -8,7 +8,7 @@ import cv2
 import math
 from edgeDetection.util import draw_line
 
-DELTA_THETA = 1
+DELTA_THETA = 3
 DELTA_D = 1
 
 
@@ -33,9 +33,9 @@ def initializeHough(h, w):
 
 def getEdges(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (3, 3), 0)
+    #blurred = cv2.GaussianBlur(gray, (3, 3), 0)
 
-    wide = cv2.Canny(blurred, 10, 200)
+    wide = cv2.Canny(gray, 10, 200)
     # tight = cv2.Canny(blurred, 225, 250)
     # auto = auto_canny(blurred)
     return wide
