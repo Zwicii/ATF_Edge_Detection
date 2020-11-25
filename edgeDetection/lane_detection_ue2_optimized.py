@@ -45,7 +45,7 @@ def processFrame(img):
     h, w = edges.shape
 
     # mask
-    mask = cv2.imread("data/highway1-2.png", cv2.IMREAD_GRAYSCALE)
+    mask = cv2.imread("data/mask_1.png", cv2.IMREAD_GRAYSCALE)
     edges[mask == 0] = 0
 
     H = getParameterSpace(edges)
