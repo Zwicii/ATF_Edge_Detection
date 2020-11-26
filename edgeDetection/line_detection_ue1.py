@@ -8,7 +8,7 @@ import cv2
 import math
 from edgeDetection.util import draw_line
 
-DELTA_THETA = 3
+DELTA_THETA = 1
 DELTA_D = 1
 
 

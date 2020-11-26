@@ -4,13 +4,10 @@ from edgeDetection.line_detection_ue1 import DELTA_D, DELTA_THETA
 from edgeDetection.util import draw_line
 from edgeDetection.line_detection_ue1 import getEdges
 
-
 THRESHOLD = 40
-THRESHOLD_THETA = 35
-THRESHOLD_D = 120
-THRESHOLD_IMAGE_W = 50
-
-
+THRESHOLD_THETA = 34
+THRESHOLD_D = 80
+THRESHOLD_IMAGE_W = 30
 
 def processFrame(img):
     edges = getEdges(img)
@@ -98,7 +95,7 @@ def getDrawingParameters(d, theta, w, h):
     val = None
 
     if -THRESHOLD_IMAGE_W <= x_intersection <= w + THRESHOLD_IMAGE_W:
-        if x_intersection < w/2 and 40 < np.rad2deg(theta) < 80: # left lane
+        if x_intersection < w/2 and 20 < np.rad2deg(theta) < 55: # left lane
             type = "left_lane"
         elif x_intersection > w/2 and 100 < np.rad2deg(theta) < 160: # right lane
             type = "right_lane"
@@ -117,7 +114,7 @@ if __name__ == '__main__':
         if not ret:
             break
 
-        ksize = (7, 7)
+        ksize = (5, 5)
         frame = cv2.blur(frame, ksize)
         processedFrame = processFrame(frame)
         cv2.imshow("Result", processedFrame)
@@ -127,7 +124,5 @@ if __name__ == '__main__':
     cv2.destroyAllWindows()
     cap.release()
 
-    #read image
-    img = cv2.imread("data/highway1-3.png")
 
 
