@@ -45,7 +45,7 @@ def processFrame(img):
     h, w = edges.shape
 
     # mask
-    mask = cv2.imread("data/mask_1.png", cv2.IMREAD_GRAYSCALE)
+    mask = cv2.imread("data/mask_final.png", cv2.IMREAD_GRAYSCALE)
     edges[mask == 0] = 0
 
     H = getParameterSpace(edges)
@@ -146,7 +146,7 @@ if __name__ == '__main__':
         if not ret:
             break
 
-        ksize = (3, 3)
+        ksize = (4, 4)
         frame = cv2.blur(frame, ksize)
         processedFrame = processFrame(frame)
         cv2.imshow("Result", processedFrame)

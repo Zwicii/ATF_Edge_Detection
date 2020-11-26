@@ -18,7 +18,7 @@ def processFrame(img):
     cv2.imshow("edges", edges)
 
     # mask
-    mask = cv2.imread("data/mask.png", cv2.IMREAD_GRAYSCALE)
+    mask = cv2.imread("data/mask_final.png", cv2.IMREAD_GRAYSCALE)
     edges[mask == 0] = 0
 
     lines = cv2.HoughLines(edges, 1, np.pi / 180, THRESHOLD)
@@ -127,7 +127,7 @@ if __name__ == '__main__':
         if not ret:
             break
 
-        ksize = (7, 7)
+        ksize = (4, 4)
         frame = cv2.blur(frame, ksize)
         processedFrame = processFrame(frame)
         cv2.imshow("Result", processedFrame)
