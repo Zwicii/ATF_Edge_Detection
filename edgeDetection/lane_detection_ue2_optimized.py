@@ -7,38 +7,36 @@ from edgeDetection.line_detection_ue1 import getEdges, initializeHough
 
 
 
-THRESHOLD = 50
-THRESHOLD_THETA = 25
-THRESHOLD_D = 110
+THRESHOLD = 40
+THRESHOLD_THETA = 30
+THRESHOLD_D = 100
 THRESHOLD_IMAGE_W = 50
 
 
 def getParameterSpace(edges):
 
     h, w = edges.shape
-    #H = initializeHough(h, w)
 
-    edges_array = np.array(np.argwhere(edges != 0))
+    edges_matrix = np.array(np.argwhere(edges != 0))
 
-    x_array = np.transpose([edges_array[:, 1]] * (180 // DELTA_THETA))
-    y_array = np.transpose([edges_array[:, 0]] * (180 // DELTA_THETA))
+    x_matrix = np.tile(edges_matrix[:, 1], ((180 // DELTA_THETA), 1)).T
+    y_matrix = np.tile(edges_matrix[:, 0], ((180 // DELTA_THETA), 1)).T
 
     theta = np.array(range(0, 180, DELTA_THETA))
     theta_rad = np.deg2rad(theta)
-    theta_array = np.array([theta_rad, ] * len(x_array))
+    theta_matrix = np.tile(theta_rad, (len(x_matrix), 1))
 
-    d_array = x_array * np.cos(theta_array) + y_array * np.sin(theta_array)
-    d_array = (d_array + w) // DELTA_D
-    d_array = d_array.astype(int)
+    d_matrix = x_matrix * np.cos(theta_matrix) + y_matrix * np.sin(theta_matrix)
+    d_matrix = (d_matrix + w) // DELTA_D
+    d_matrix = d_matrix.astype(int)
 
-    # https://stackoverflow.com/questions/34755244/apply-bincount-to-each-row-of-a-2d-numpy-array
-
-    d_array = np.transpose(d_array)
-    N = d_array.max() + 1
-    id = d_array + (N * np.arange(d_array.shape[0]))[:, None]
-    H = np.bincount(id.ravel(), minlength=N * d_array.shape[0]).reshape(-1, N).T
+    d_matrix = np.transpose(d_matrix)
+    N = d_matrix.max() + 1
+    id = d_matrix + (N * np.arange(d_matrix.shape[0]))[:, None]
+    H = np.bincount(id.ravel(), minlength=N * d_matrix.shape[0]).reshape(-1, N).T
 
     return H
+
 
 def processFrame(img):
     edges = getEdges(img)
@@ -52,7 +50,6 @@ def processFrame(img):
     idx_d_arr, idx_theta_arr = np.where(H > THRESHOLD)
     temp_idx = np.argsort(-1 * H[idx_d_arr, idx_theta_arr])
     lines = np.array([idx_d_arr[temp_idx], idx_theta_arr[temp_idx]]).T
-    #lines = cv2.HoughLines(edges, 1, np.pi / 180, THRESHOLD)
 
     valueStore = []
     pos_left = (round(w / 2 - 120), round(h - 30))
@@ -64,7 +61,6 @@ def processFrame(img):
 
         d = idx_d * DELTA_D - w
         theta = (idx_theta * DELTA_THETA)
-
         originalValues = None
 
         if theta < THRESHOLD_THETA:
@@ -155,8 +151,5 @@ if __name__ == '__main__':
 
     cv2.destroyAllWindows()
     cap.release()
-
-    #read image
-    img = cv2.imread("data/highway1-3.png")
 
 
