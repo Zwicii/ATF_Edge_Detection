@@ -38,13 +38,14 @@ def getParameterSpace(edges):
     return H
 
 
-def processFrame(img):
+def processFrame(img, mask):
     edges = getEdges(img)
     h, w = edges.shape
 
     # mask
-    mask = cv2.imread("data/mask.png", cv2.IMREAD_GRAYSCALE)
-    edges[mask == 0] = 0
+    #mask = cv2.imread("data/mask.png", cv2.IMREAD_GRAYSCALE)
+    if mask is not None:
+        edges[mask == 0] = 0
 
     H = getParameterSpace(edges)
     idx_d_arr, idx_theta_arr = np.where(H > THRESHOLD)
@@ -117,7 +118,7 @@ def processFrame(img):
             0.8,  # font size
             (0, 0, 0),  # font color
             2)  # font stroke
-    return img
+    return img, left_lane[0] if left_lane is not None else None, right_lane[0] if right_lane is not None else None
 
 def getDrawingParameters(d, theta, w, h):
     x_intersection = (d - h * np.sin(theta)) / np.cos(theta)
