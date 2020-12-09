@@ -53,8 +53,8 @@ def processFrame(img, mask):
     lines = np.array([idx_d_arr[temp_idx], idx_theta_arr[temp_idx]]).T
 
     valueStore = []
-    pos_left = (round(w / 2 - 120), round(h - 30))
-    pos_right = (round(w / 2 + 90), round(h - 30))
+    pos_left = (round(w / 2 - 150), round(h - 10))
+    pos_right = (round(w / 2 + 50), round(h - 10))
     left_lane = None
     right_lane = None
 
