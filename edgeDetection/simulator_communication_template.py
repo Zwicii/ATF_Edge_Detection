@@ -48,7 +48,8 @@ def telemetry(data):
 
         dist_left, dist_right = lane_detection_opencv(image)
         updateAngelAndThrottle(speed)
-        send_control(calculate_steeringAngle(dist_left, dist_right), throttle)
+        #send_control(calculate_steeringAngle(dist_left, dist_right), throttle)
+        send_control(0, throttle);
 
         # Code for the snake line driving
         # if COUNTER % 2 == 0:
@@ -73,6 +74,7 @@ def send_control(steering_angle, throttle):
 def calculate_steeringAngle(dist_left, dist_right):
     left_edge = -150
     right_edge = 150
+
     # 150 - 100 = 50 / 200 = 0.25 -> 100 would be the distance to have the max angle of 0.25 (7°)
     dividend = 200
     angle = 0
