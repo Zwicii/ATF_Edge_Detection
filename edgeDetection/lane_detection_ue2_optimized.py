@@ -1,10 +1,9 @@
 import cv2
 import numpy as np
-import math
+
 from edgeDetection.line_detection_ue1 import DELTA_D, DELTA_THETA
 from edgeDetection.util import draw_line
 from edgeDetection.line_detection_ue1 import getEdges, initializeHough
-
 
 
 THRESHOLD = 40
@@ -104,9 +103,9 @@ def processFrame(img, mask):
             "L: " + str(left_lane[0])  + " px",  # text
             pos_left,  # position at which writing has to start
             cv2.FONT_HERSHEY_SIMPLEX,  # font family
-            0.8,  # font size
+            0.5,  # font size
             (0, 0, 0),  # font color
-            2)  # font stroke
+            1)  # font stroke
 
     if right_lane is not None:
         draw_line(img, right_lane[1], np.deg2rad(right_lane[2]), color=(0, 0, 204))
@@ -115,9 +114,9 @@ def processFrame(img, mask):
             "R: " + str(right_lane[0]) + " px",  # text
             pos_right,  # position at which writing has to start
             cv2.FONT_HERSHEY_SIMPLEX,  # font family
-            0.8,  # font size
+            0.5,  # font size
             (0, 0, 0),  # font color
-            2)  # font stroke
+            1)  # font stroke
     return img, left_lane[0] if left_lane is not None else None, right_lane[0] if right_lane is not None else None
 
 def getDrawingParameters(d, theta, w, h):
