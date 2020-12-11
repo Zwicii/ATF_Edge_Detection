@@ -12,20 +12,26 @@ THRESHOLD_IMAGE_W = 50
 
 
 
-def processFrame(img):
+def processFrame(img, mask):
     edges = getEdges(img)
     h, w = edges.shape
-    cv2.imshow("edges", edges)
+    #cv2.imshow("edges", edges)
 
     # mask
-    mask = cv2.imread("data/mask.png", cv2.IMREAD_GRAYSCALE)
-    edges[mask == 0] = 0
+    if mask is not None:
+        #mask = cv2.imread("data/mask.png", cv2.IMREAD_GRAYSCALE)
+        edges[mask == 0] = 0
 
     lines = cv2.HoughLines(edges, 1, np.pi / 180, THRESHOLD)
 
     valueStore = []
-    pos_left = (round(w / 2 - 120), round(h - 30))
-    pos_right = (round(w / 2 + 90), round(h - 30))
+    #old configs for ex02
+    #pos_left = (round(w / 2 - 120), round(h - 30))
+    #pos_right = (round(w / 2 + 90), round(h - 30))
+
+    #new configs for ex03
+    pos_left = (round(w / 2 - 150), round(h - 10))
+    pos_right = (round(w / 2 + 50), round(h - 10))
     left_lane = None
     right_lane = None
 
@@ -76,9 +82,9 @@ def processFrame(img):
                 "L: " + str(left_lane[0]),  # text
                 pos_left,  # position at which writing has to start
                 cv2.FONT_HERSHEY_SIMPLEX,  # font family
-                0.8,  # font size
+                0.5,  # font size
                 (0, 0, 0),  # font color
-                2)  # font stroke
+                1)  # font stroke
 
         if right_lane is not None:
             draw_line(img, right_lane[1], np.deg2rad(right_lane[2]), color=(0, 0, 204))
@@ -87,11 +93,11 @@ def processFrame(img):
                 "R: " + str(right_lane[0]),  # text
                 pos_right,  # position at which writing has to start
                 cv2.FONT_HERSHEY_SIMPLEX,  # font family
-                0.8,  # font size
+                0.5,  # font size
                 (0, 0, 0),  # font color
-                2)  # font stroke
+                1)  # font stroke
 
-    return img
+    return img, left_lane[0] if left_lane is not None else None, right_lane[0] if right_lane is not None else None
 
 def getDrawingParameters(d, theta, w, h):
     x_intersection = (d - h * np.sin(theta)) / np.cos(theta)
