@@ -5,7 +5,7 @@ import numpy as np
 from flask import Flask
 from flask_socketio import SocketIO
 import keras.models
-import behavioral_cloning_utils as utils
+import edgeDetection.behavioral_cloning_utils as utils
 
 app = Flask(__name__)
 socket_io = SocketIO(app)
