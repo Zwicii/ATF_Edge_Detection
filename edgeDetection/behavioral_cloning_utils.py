@@ -2,6 +2,8 @@ import cv2
 import os
 import numpy as np
 import matplotlib.image as mpimg
+import random
+from PIL import Image
 
 IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS = 160, 320, 3
 INPUT_SHAPE = (IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS)
@@ -50,15 +52,31 @@ def choose_image(data_dir, center, left, right, steering_angle):
     Randomly choose an image from the center, left or right, and adjust
     the steering angle.
     """
-    # TODO: implement random choice of camera image
-    return load_image(data_dir, center), steering_angle
+    randNum = random.randint(0, 2)
+    img = None
+
+    if randNum == 0:
+        img = center
+    elif randNum == 1:
+        img = left
+        steering_angle += 0.2
+    else:
+        img = right
+        steering_angle -= 0.2
+
+    return load_image(data_dir, img), steering_angle
 
 
 def random_flip(image, steering_angle):
     """
     Randomly flip the image left <-> right and adjust the steering angle.
     """
-    # TODO: implement random image flip
+    randNum = random.randint(0, 1)
+
+    if randNum == 0:
+        steering_angle *= -1
+        image = np.fliplr(image)
+
     return image, steering_angle
 
 
@@ -66,7 +84,15 @@ def random_translate(image, steering_angle):
     """
     Randomly shift the image vertically and horizontally (translation).
     """
-    # TODO: implement random translation
+    h, w = image.shape[:2]
+    th = random.randint(-50, 50)
+    tv = random.randint(-5, 5)
+
+    T = np.float32([[1, 0, th], [0, 1, tv]])
+
+    steering_angle = steering_angle + th * 0.002
+    image = cv2.warpAffine(image, T, (w, h))
+
     return image, steering_angle
 
 
@@ -104,7 +130,7 @@ def batch_generator(data_dir, image_paths, steering_angles, batch_size, use_augm
 
 if __name__ == '__main__':
     print("Testing the augmentation methods...")
-    image, steering_angle = choose_image('test-data', 'center.jpg', 'left.jpg', 'right.jpg', 0.2)
+    image, steering_angle = choose_image('data/TrainingData', 'center_2020_12_11_16_16_13_693.jpg', 'left_2020_12_11_16_16_13_693.jpg', 'right_2020_12_11_16_16_13_693.jpg', 0.2)
     cv2.imshow("chosen image - steer: " + str(steering_angle), cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
     image, steering_angle = random_flip(image, steering_angle)
     cv2.imshow("flipped image - steer: " + str(steering_angle), cv2.cvtColor(image, cv2.COLOR_RGB2BGR))

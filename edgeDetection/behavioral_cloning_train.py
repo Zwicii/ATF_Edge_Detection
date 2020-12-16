@@ -73,7 +73,6 @@ def train_model(model, input_train, input_test, output_train, output_test):
               callbacks=[checkpoint],
               verbose=1)
 
-
 if __name__ == '__main__':
     data = load_data()
     model = build_model()

@@ -44,6 +44,6 @@ def send_control(steering_angle, throttle):
 
 
 if __name__ == '__main__':
-    model = keras.models.load_model('model.h5')
+    model = keras.models.load_model('model-001.h5')
     model.summary()
     socket_io.run(app, port=4567)
