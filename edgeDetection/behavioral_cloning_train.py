@@ -31,19 +31,25 @@ def load_data():
 def build_model():
     model = keras.models.Sequential(name="my-self-driving-car")
     model.add(keras.layers.Lambda(lambda x: x / 127.5 - 1.0, input_shape=INPUT_SHAPE))  # pixel values between -1 and 1
-    # TODO: add some convolutional layers to the model
-    model.add(keras.layers.Conv2D(filters=24, kernel_size=(5, 5), strides=2, activation="elu"))
-    model.add(keras.layers.Conv2D(filters=36, kernel_size=(5, 5), strides=2, activation="elu"))
-    model.add(keras.layers.Conv2D(filters=48, kernel_size=(5, 5), strides=2, activation="elu"))
-    model.add(keras.layers.Conv2D(filters=64, kernel_size=(3, 3), strides=1, activation="elu"))
-    model.add(keras.layers.Conv2D(filters=64, kernel_size=(3, 3), strides=1, activation="elu"))
+
+    #convolutional layers
+    model.add(keras.layers.Conv2D(filters=10, kernel_size=(5, 5), strides=2, activation="elu"))
+    model.add(keras.layers.Conv2D(filters=20, kernel_size=(3, 3), strides=1, activation="elu"))
+    #model.add(keras.layers.Conv2D(filters=24, kernel_size=(5, 5), strides=2, activation="elu"))
+    #model.add(keras.layers.Conv2D(filters=36, kernel_size=(5, 5), strides=2, activation="elu"))
+    #model.add(keras.layers.Conv2D(filters=48, kernel_size=(5, 5), strides=2, activation="elu"))
+    #model.add(keras.layers.Conv2D(filters=64, kernel_size=(3, 3), strides=1, activation="elu"))
+    #model.add(keras.layers.Conv2D(filters=64, kernel_size=(3, 3), strides=1, activation="elu"))
 
     model.add(keras.layers.Dropout(0.5))
     model.add(keras.layers.Flatten())
-    # TODO: add some fully connected layers to the model
-    model.add(keras.layers.Dense(100, activation="elu"))
-    model.add(keras.layers.Dense(50, activation="elu"))
-    model.add(keras.layers.Dense(10, activation="elu"))
+
+    #dense layers
+    model.add(keras.layers.Dense(60, activation="elu"))
+    model.add(keras.layers.Dense(20, activation="elu"))
+    #model.add(keras.layers.Dense(100, activation="elu"))
+    #model.add(keras.layers.Dense(50, activation="elu"))
+    #model.add(keras.layers.Dense(10, activation="elu"))
 
     model.add(keras.layers.Dense(1))  # output layer
     model.summary()
